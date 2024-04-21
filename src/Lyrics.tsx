@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import RabbitLyrics from 'rabbit-lyrics'
 import "./css/Lyrics.css";
 
@@ -61,6 +61,7 @@ export const Lyrics = ({audio, queue, currentSongIndex} : LyricsArgs) => {
     wrapper.append(newDiv);
 
     let rlHandler = new RabbitLyrics(newDiv, audio);
+    console.log(rlHandler);
   }
 
   return (
