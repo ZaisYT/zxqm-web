@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+:root {
+  --primary-color: rgba(254, 93, 38, 1);
+  --secondary-color: rgba(219, 84, 97, 1);
+
+  --primary-bgcolor: rgba(44, 48, 46, 1);
+  --secondary-bgcolor: rgba(71, 74, 72, 1);
+
+  --subtitle-color: rgba(144, 149, 144, 1);
+  --title-color: rgba(255, 255, 255 ,1);
+}
+
+* {
+  padding: 0;
+  margin: 0;
+}
+.header-wrapper {
+  position: fixed;
+  top: 0;
+  width: 100%;
+
+  .zxqm-header {
+    padding: 10px;
+    height: 5vh;
+    display: flex;
+    width: auto;
+    background-color: var(--primary-bgcolor);
+    border-bottom: var(--title-color);
+  
+    & .first {
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      width: 20%;
+      
+      & a {
+        margin-left: 20px;
+        font-size: 32px;
+        text-decoration: none;
+        color: var(--title-color);
+        font-family: "Open Sans", sans-serif;
+        font-weight: 800;
+      }
+    }
+  
+    & div:not(.first) {
+      width: 80%;
+  
+      & ul {
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        height: 100%;
+        list-style-type: none;
+        
+        & li {
+          margin-right: 20px;
+  
+          & a {
+            display: flex;
+            text-decoration: none;
+            transition: all .3s;
+            width: 35px;
+            height: 35px;
+            color: var(--title-color);
+            font-family: "Open Sans", sans-serif;
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+  
+          & .search {
+            background-image: url("../svgs/search.svg");
+          }
+  
+          & .search:hover {
+            background-image: url("../svgs/active-search.svg");
+          }
+          
+          & .about {
+            background-image: url("../svgs/about.svg");
+          }
+  
+          & .about:hover {
+            background-image: url("../svgs/active-about.svg");
+          }
+  
+          
+          & .config {
+            background-image: url("../svgs/config.svg");
+          }
+  
+          & .config:hover {
+            background-image: url("../svgs/active-config.svg");
+          }
+  
+          & .account {
+            background-image: url("../svgs/account.svg");
+          }
+  
+          & .account:hover {
+            background-image: url("../svgs/active-account.svg");
+          }
+        }
+      }
+    }
+  }
+}

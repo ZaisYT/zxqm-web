@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+:root {
+  --primary-color: rgba(254, 93, 38, 1);
+  --secondary-color: rgba(219, 84, 97, 1);
+
+  --primary-bgcolor: rgba(44, 48, 46, 1);
+  --secondary-bgcolor: rgba(71, 74, 72, 1);
+
+  --subtitle-color: rgba(144, 149, 144, 1);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --title-color: rgba(255, 255, 255 ,1);
+}
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+#lyricsWrapper {
+  overflow: hidden;
+  display: flex;
+  margin-top: calc(5vh + 20px);
+  height: calc(95vh - 20px);
+  background-color: var(--secondary-bgcolor);
+  color: var(--title-color);
+  font-family: "Open Sans", sans-serif;
+
+  & .rabbit-lyrics {
+    scroll-behavior: smooth;
+    height: calc(90vh - 20px);
+    width: 100%;
+    overflow-y: auto;
+    background-color: var(--secondary-bgcolor);
+    border: 0px;
+  }
+
+  & .rabbit-lyrics::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.rabbit-lyrics__line {
+  cursor: pointer;
+  transition: all .3s;
+  padding-block: 15px !important;
+  line-height: 1.5em;
+  min-height: 1.5em;
+  padding: 0 1em;
+}
+
+.rabbit-lyrics__line--active {
+  background-color: rgba(0, 0, 0, 0) !important;
+}
+
+.rabbit-lyrics__inline--active {
+  transition: all .3s;
+  color: var(--primary-color) !important;
+}
+
+.rabbit-lyrics__inline {
+  transition: all .3s;
+  color: var(--subtitle-color);
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
+  font-size: 30px;
+}
+
+.rabbit-lyrics {
+  text-align: left !important;
+  padding: 20px !important;
+}
