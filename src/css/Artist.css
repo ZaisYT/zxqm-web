@@ -67,56 +67,71 @@
   margin: 0;
 }
 
-#lyricsWrapper {
-  overflow: hidden;
-  display: flex;
+.artistProfile {
   margin-top: calc(5vh + 10px);
-  height: calc(95vh - 20px);
+  padding: 10px 10px 0 0;
+  min-height: calc(95vh - 100px);
   background-color: var(--background-100);
   color: var(--text-950);
   font-family: "Open Sans", sans-serif;
+  display: flex;
 
-  & .rabbit-lyrics {
-    scroll-behavior: smooth;
-    height: calc(90vh - 20px);
-    width: 100%;
-    overflow-y: auto;
-    background-color: var(--background-100);
-    border: 0px;
+  & .artistContent {
+    width: 70%;
+
+    & .recommended, .latest, .discography {
+      padding-inline: 20px;
+      height: 30%;
+    }
+
+    & .recommended, .latest {
+      margin-bottom: auto;
+    }
   }
 
-  & .rabbit-lyrics::-webkit-scrollbar {
-    display: none;
+  & .artistInfo {
+    margin: 10px;
+    padding: 10px;
+    width: 30%;
+    margin-bottom: 130px;
+    border-radius: 5px;
+    border: 1px solid var(--background-300);
+
+    & .topSection {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px dashed var(--background-300);
+      stroke-width: 20px;
+
+      > h1 {
+        font-size: 40px;
+      }
+
+      > img {
+        height: 35px;
+        width: 35px;
+        margin-left: 5px;
+      }
+    }
+
+    & .infoSection {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      > img {
+        width: 400px;
+        height: 400px;
+        margin-block: 20px;
+      }
+
+      > p {
+        width: 28vw;
+        height: calc((95vh - 100px) - 440px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
   }
-}
-
-.rabbit-lyrics__line {
-  cursor: pointer;
-  transition: all .3s;
-  padding-block: 15px !important;
-  line-height: 1.5em;
-  min-height: 1.5em;
-  padding: 0 1em;
-}
-
-.rabbit-lyrics__line--active {
-  background-color: var(--background-200) !important;
-}
-
-.rabbit-lyrics__inline--active {
-  transition: all .3s;
-  color: var(--accent-500) !important;
-}
-
-.rabbit-lyrics__inline {
-  transition: all .3s;
-  color: var(--text-400);
-  font-family: "Open Sans", sans-serif;
-  font-weight: 600;
-  font-size: 30px;
-}
-
-.rabbit-lyrics {
-  text-align: left !important;
-  padding: 20px !important;
 }

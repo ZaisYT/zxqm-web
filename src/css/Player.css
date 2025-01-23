@@ -1,16 +1,70 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
+::selection {
+  color: var(--text-100);
+  background: var(--accent-400);
+}
+
 :root {
-  --primary-color: rgba(254, 93, 38, 1);
-  --primary-fade-color: rgb(190, 70, 29, 1);
-  --secondary-color: rgba(219, 84, 97, 1);
+  --text-50: #0d0d0d;
+  --text-100: #1a1a1a;
+  --text-200: #333333;
+  --text-300: #4d4d4d;
+  --text-400: #666666;
+  --text-500: #808080;
+  --text-600: #999999;
+  --text-700: #b3b3b3;
+  --text-800: #cccccc;
+  --text-900: #e6e6e6;
+  --text-950: #f2f2f2;
 
-  --primary-bgcolor: rgba(44, 48, 46, 1);
-  --secondary-bgcolor: rgba(71, 74, 72, 1);
+  --background-50: #0d0d0d;
+  --background-100: #1a1a1a;
+  --background-200: #333333;
+  --background-300: #4d4d4d;
+  --background-400: #666666;
+  --background-500: #808080;
+  --background-600: #999999;
+  --background-700: #b3b3b3;
+  --background-800: #cccccc;
+  --background-900: #e6e6e6;
+  --background-950: #f2f2f2;
 
-  --subtitle-color: rgba(144, 149, 144, 1);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --title-color: rgba(255, 255, 255, 1);
+  --primary-50: #001a15;
+  --primary-100: #00332b;
+  --primary-200: #006655;
+  --primary-300: #009980;
+  --primary-400: #00ccaa;
+  --primary-500: #00ffd5;
+  --primary-600: #33ffdd;
+  --primary-700: #66ffe6;
+  --primary-800: #99ffee;
+  --primary-900: #ccfff6;
+  --primary-950: #e5fffb;
+
+  --secondary-50: #001a15;
+  --secondary-100: #00332a;
+  --secondary-200: #006653;
+  --secondary-300: #00997d;
+  --secondary-400: #00cca7;
+  --secondary-500: #00ffd0;
+  --secondary-600: #33ffda;
+  --secondary-700: #66ffe3;
+  --secondary-800: #99ffec;
+  --secondary-900: #ccfff6;
+  --secondary-950: #e5fffa;
+
+  --accent-50: #1a0e00;
+  --accent-100: #331d00;
+  --accent-200: #663a00;
+  --accent-300: #995700;
+  --accent-400: #cc7400;
+  --accent-500: #ff9100;
+  --accent-600: #ffa733;
+  --accent-700: #ffbd66;
+  --accent-800: #ffd399;
+  --accent-900: #ffe9cc;
+  --accent-950: #fff4e5;
 }
 
 * {
@@ -22,6 +76,7 @@
   position: fixed;
   bottom: 0;
   width: 100%;
+  z-index: 100;
 
   & .zxqm-player {
     display: flex;
@@ -32,24 +87,25 @@
       & input {
         cursor: pointer;
         position: absolute;
-        bottom: 70px;
+        bottom: 80px;
         -webkit-appearance: none;
+        appearance: none;
         width: 100%;
         height: 10px;
-        background-color: var(--secondary-bgcolor);
-        border: 1px solid var(--border-color);
-        background-image: linear-gradient(var(--primary-color), var(--primary-color));
-        background-size: 50% 100%;
+        background-color: var(--background-100);
+        border-bottom: 1px dashed var(--background-200);
+        border-top: 1px solid var(--background-300);
+        background-image: linear-gradient(var(--accent-300), var(--accent-300));
+        background-size: 0% 1%;
         background-repeat: no-repeat;
       }
 
       & input::-webkit-slider-thumb {
         -webkit-appearance: none;
-        height: 10px;
-        width: 10px;
-        /* border-radius: 10px; */
-        background: var(--primary-fade-color);
-        border: 2px solid var(--border-color);
+        height: 15px;
+        width: 15px;
+        border-radius: 2px;
+        background: var(--accent-400);
       }
 
       & div {
@@ -57,7 +113,7 @@
         padding-inline: 10px;
         width: calc(100% - 20px);
         position: absolute;
-        bottom: 85px;
+        bottom: 95px;
 
         & #totalTime {
           text-align: end;
@@ -69,23 +125,22 @@
           font-family: "Open Sans", sans-serif;
           font-size: 18px;
           font-weight: 600;
-          color: var(--subtitle-color);
+          color: var(--text-600);
         }
       }
 
       & div:hover {
         > p {
           transition: all .3s;
-          color: var(--title-color);
+          color: var(--text-950);
         }
       }
     }
 
     > div:not(.seek) {
       display: flex;
-      padding: 5px;
-      background-color: var(--primary-bgcolor);
-      /* border: 1px solid var(--border-color); */
+      padding: 10px;
+      background-color: var(--background-100);
 
       & .info {
         display: flex;
@@ -94,7 +149,6 @@
 
         & img {
           width: 60px;
-          height: 60px;
           margin-right: 10px;
         }
 
@@ -106,7 +160,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             font-size: 20px;
-            color: var(--title-color);
+            color: var(--text-950);
           }
 
           & h2 {
@@ -114,7 +168,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             font-size: 14px;
-            color: var(--subtitle-color);
+            color: var(--text-600);
           }
         }
       }
@@ -141,21 +195,20 @@
             -webkit-appearance: none;
             width: 100%;
             height: 20px;
-            background-color: var(--secondary-bgcolor);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            background-image: linear-gradient(var(--primary-color), var(--primary-color));
+            background-color: var(--background-100);
+            border-radius: 5px;
+            border: 1px solid var(--background-300);
+            background-image: linear-gradient(var(--accent-300), var(--accent-300));
             background-size: 50% 100%;
             background-repeat: no-repeat;
           }
 
           & #volumeController::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 10px;
-            background: var(--primary-fade-color);
-            border: 2px solid var(--border-color);
+            height: 25px;
+            width: 25px;
+            border-radius: 5px;
+            background: var(--accent-400);
           }
         }
 
@@ -173,14 +226,12 @@
 }
 
 .button {
-  background-color: var(--secondary-bgcolor);
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
+  background-color: var(--background-100);
   padding: 3px;
   width: 30px;
   height: 30px;
   cursor: pointer;
-  margin-right: 10px;
+  margin-right: 15px;
 
   & p {
     transition: all .3s;

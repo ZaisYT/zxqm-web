@@ -24,13 +24,16 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
     "lyricsURI": "",
     "songArtists": [],
     "songName": "",
-    "songURL": ""
+    "songURL": "",
+    "releaseURI": ""
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [loadingNewSong, setLoadingNewSong] = useState(false);
   const [isRepeatEnabled, setIsRepeatEnabled] = useState(false);
   const [isShuffleEnabled, setIsShuffleEnabled] = useState(false);
+
+  const [artwork, setArtwork] = useState("");
 
   useEffect(() => {
     audio.addEventListener('ended', handleSongEnded);
@@ -48,6 +51,18 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
   }, [isRepeatEnabled]);
 
   useEffect(() => {
+    if (queue.length == 0) {
+      setSongData({
+        "iconURL": "",
+        "lyricsURI": "",
+        "songArtists": [],
+        "songName": "",
+        "songURL": "",
+        "releaseURI": ""
+      })
+      return
+    }
+
     if (loadingNewSong) {
       audio.pause();
       audio.currentTime = 0;
@@ -99,7 +114,7 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
       const randomIndex = Math.floor(Math.random() * queue.length);
       newIndex = randomIndex !== currentSongIndex ? randomIndex : (randomIndex + 1) % queue.length;
     } else {
-      if (queue.length == 1){
+      if (queue.length == 1) {
         newIndex = currentSongIndex;
       } else {
         newIndex = (currentSongIndex + 1) % queue.length;
@@ -126,6 +141,19 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
     event.target.style.backgroundSize = ((val - min) * 10000) / (max - min) + '% 100%'
   }
 
+  const formatArtists = (artists: string[]): string => {
+    if (!artists || artists.length == 0) return "";
+    const artistCount = artists.length;
+
+    if (artistCount === 1) {
+      return artists[0];
+    } else if (artistCount === 2) {
+      return `${artists[0]} & ${artists[1]}`;
+    } else {
+      return `${artists.slice(0, -1).join(', ')} & ${artists[artistCount - 1]}`;
+    }
+  };
+
   const locationData = useLocation();
 
   audio.preload = "metadata";
@@ -141,19 +169,19 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
       let duration = Math.floor(audio.duration);
       let seconds;
       if (duration % 60 <= 9) {
-        seconds = "0"+duration % 60; 
+        seconds = "0" + duration % 60;
       } else {
         seconds = duration % 60;
       }
 
       let minutes;
       if (Math.floor(duration / 60) <= 9) {
-        minutes = "0"+Math.floor(duration / 60); 
+        minutes = "0" + Math.floor(duration / 60);
       } else {
         minutes = Math.floor(duration / 60);
       }
 
-      totalTimeIndicator.innerHTML = `${minutes+":"+seconds}`; 
+      totalTimeIndicator.innerHTML = `${minutes + ":" + seconds}`;
 
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
@@ -170,29 +198,37 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
       let currentTime = Math.floor(audio.currentTime);
       let seconds;
       if (currentTime % 60 <= 9) {
-        seconds = "0"+currentTime % 60; 
+        seconds = "0" + currentTime % 60;
       } else {
         seconds = currentTime % 60;
       }
 
       let minutes;
       if (Math.floor(currentTime / 60) <= 9) {
-        minutes = "0"+Math.floor(currentTime / 60); 
+        minutes = "0" + Math.floor(currentTime / 60);
       } else {
         minutes = Math.floor(currentTime / 60);
       }
 
-      curTimeIndicator.innerHTML = `${minutes+":"+seconds}`; 
+      curTimeIndicator.innerHTML = `${minutes + ":" + seconds}`;
     });
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.load();
 
+    fetch(`https://zxqm-rest-api-default-rtdb.firebaseio.com/releases/${songData.releaseURI}/iconURL.json`)
+      .then(res => res.json())
+      .then((data: any) => {  // Use `any` type as a workaround for now
+        setArtwork(data);
+      });
+  }, [audio, songData]);
+
+  useEffect(() => {
     if ("mediaSession" in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: songData.songName,
-        artist: songData.songArtists[0],
-        artwork: [{ src: songData.iconURL }],
+        artist: formatArtists(songData.songArtists),
+        artwork: [{ src: artwork }],
       });
     }
 
@@ -213,84 +249,84 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
     navigator.mediaSession.setActionHandler("nexttrack", () => {
       audio.currentTime = audio.duration - 1;
     });
-
-    return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-    };
-
-  }, [audio, songData]);
+  }, [artwork, audio]);
 
   return (
-    <div className='player-wrapper'>
-      <div className='zxqm-player'>
-        <div className="seek">
-          <div className="times">
-            <p id='curTime'>00:00</p>
-            <p id='totalTime'>00:00</p>
+    <>
+      {queue.length == 0 ? "" :
+      <div className='player-wrapper'>
+        <div className='zxqm-player'>
+          <div className="seek">
+            <div className="times">
+              <p id='curTime'>00:00</p>
+              <p id='totalTime'>00:00</p>
+            </div>
+            <input id="seekSlider" type="range" onChange={changeSongTime} step={100} />
           </div>
-          <input id="seekSlider" type="range" onChange={changeSongTime} step={100} />
-        </div>
-        <div>
-          <div className="info">
-            <img draggable="false" src={songData.iconURL} />
-            <div className="details">
-              <h1>{songData.songName}</h1>
-              <h2>{songData.songArtists[0]}</h2>
+          <div>
+            <div className="info">
+              <img draggable="false" src={artwork ? artwork : ""} />
+              <div className="details">
+                <h1>{songData.songName}</h1>
+                <h2>{formatArtists(songData.songArtists)}</h2>
+              </div>
+            </div>
+
+            <div className="controls">
+              <PlayerButton
+                custom_classes={isShuffleEnabled ? 'actrandom' : 'random'}
+                onClickAction={() => {
+                  audio.pause();
+                  toggleShuffle()
+                }}
+                useLink={false}
+              />
+              <PlayerButton
+                custom_classes='back'
+                onClickAction={() => {
+                  audio.pause();
+                  if (audio.currentTime < 3 && currentSongIndex > 0) {
+                    setCurrentSongIndex(prevIndex => prevIndex - 1);
+                  } else {
+                    audio.currentTime = 0;
+                  }
+                }}
+                useLink={false}
+              />
+              <PlayerButton
+                custom_classes={isPlaying ? 'pause' : 'play'}
+                onClickAction={() => { isPlaying ? audio.pause() : audio.play() }}
+                useLink={false}
+              />
+              <PlayerButton
+                custom_classes='forward'
+                onClickAction={() => { audio.currentTime = audio.duration - 1 }}
+                useLink={false}
+              />
+              <PlayerButton
+                custom_classes={isRepeatEnabled ? 'actrepeat' : 'repeat'}
+                onClickAction={toggleRepeat}
+                useLink={false}
+              />
+            </div>
+
+            <div className="other">
+              {songData.lyricsURI != undefined ?
+                <PlayerButton
+                  custom_classes={locationData.pathname == '/lyrics' ? 'actlyrics' : 'lyrics'}
+                  onClickAction={() => { }}
+                  useLink={true}
+                /> : null}
+
+              <div className="volume">
+                <img />
+                <input type="range" id="volumeController" onChange={changeVolume} step="0.01" />
+              </div>
             </div>
           </div>
-
-          <div className="controls">
-            <PlayerButton
-              custom_classes={isShuffleEnabled ? 'actrandom' : 'random'}
-              onClickAction={() => {
-                audio.pause();
-                toggleShuffle()
-              }}
-              useLink={false}
-            />
-            <PlayerButton
-              custom_classes='back'
-              onClickAction={() => {
-                audio.pause();
-                if (audio.currentTime < 3 && currentSongIndex > 0) {
-                  setCurrentSongIndex(prevIndex => prevIndex - 1);
-                } else {
-                  audio.currentTime = 0;
-                }
-              }}
-              useLink={false}
-            />
-            <PlayerButton
-              custom_classes={isPlaying ? 'pause' : 'play'}
-              onClickAction={() => { isPlaying ? audio.pause() : audio.play() }}
-              useLink={false}
-            />
-            <PlayerButton
-              custom_classes='forward'
-              onClickAction={() => { audio.currentTime = audio.duration - 1 }}
-              useLink={false}
-            />
-            <PlayerButton
-              custom_classes={isRepeatEnabled ? 'actrepeat' : 'repeat'}
-              onClickAction={toggleRepeat}
-              useLink={false}
-            />
-          </div>
-
-          <div className="other">
-            <PlayerButton
-              custom_classes={locationData.pathname == '/lyrics' ? 'actlyrics' : 'lyrics'}
-              onClickAction={() => { }}
-              useLink={true}
-            />
-            <div className="volume">
-              <img />
-              <input type="range" id="volumeController" onChange={changeVolume} step="0.01" />
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
+      </div>}
+    </>
   )
 }
 

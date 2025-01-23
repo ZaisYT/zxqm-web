@@ -1,0 +1,11 @@
+:root {
+  --bg-color: rgb(20, 20, 20);
+}
+
+.cardsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
