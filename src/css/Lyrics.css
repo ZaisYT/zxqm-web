@@ -71,14 +71,14 @@
   overflow: hidden;
   display: flex;
   margin-top: calc(5vh + 10px);
-  height: calc(95vh - 20px);
+  min-height: calc(95vh - 10px);
   background-color: var(--background-100);
   color: var(--text-950);
   font-family: "Open Sans", sans-serif;
 
   & .rabbit-lyrics {
     scroll-behavior: smooth;
-    height: calc(90vh - 20px);
+    min-height: calc(90vh - 10px);
     width: 100%;
     overflow-y: auto;
     background-color: var(--background-100);

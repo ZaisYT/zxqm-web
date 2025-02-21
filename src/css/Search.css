@@ -70,7 +70,7 @@
 .contentWrapper {
   padding: 20px;
   margin-top: calc(5vh + 10px);
-  height: calc(95vh - 60px);
+  min-height: calc(95vh - 50px);
   background-color: var(--background-100);
   color: var(--text-950);
   font-family: "Open Sans", sans-serif;

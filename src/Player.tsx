@@ -16,16 +16,16 @@ type PlayerReq = {
   setCurrentSongIndex: React.Dispatch<React.SetStateAction<number>>
 }
 
-const FETCHURL = "https://zxqm-rest-api-default-rtdb.firebaseio.com/songs/";
+const SONGFETCHURL = "https://zxqm-rest-api-default-rtdb.firebaseio.com/songs/";
+const ARTFETCHURL = "https://zxqm-rest-api-default-rtdb.firebaseio.com/releases/";
 
 export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: PlayerReq) => {
   const [songData, setSongData] = useState({
-    "iconURL": "",
-    "lyricsURI": "",
     "songArtists": [],
     "songName": "",
     "songURL": "",
-    "releaseURI": ""
+    "releaseURI": "",
+    "lyricsURI": ""
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -39,11 +39,6 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
     audio.addEventListener('ended', handleSongEnded);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
-    return () => {
-      audio.removeEventListener('ended', handleSongEnded);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-    };
   }, [currentSongIndex]);
 
   useEffect(() => {
@@ -51,16 +46,17 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
   }, [isRepeatEnabled]);
 
   useEffect(() => {
-    if (queue.length == 0) {
+    if (queue.length === 0) {
       setSongData({
-        "iconURL": "",
-        "lyricsURI": "",
         "songArtists": [],
         "songName": "",
         "songURL": "",
-        "releaseURI": ""
-      })
-      return
+        "releaseURI": "",
+        "lyricsURI": ""
+      });
+      audio.pause();
+      audio.src = "";
+      return;
     }
 
     if (loadingNewSong) {
@@ -68,11 +64,18 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
       audio.currentTime = 0;
     }
 
-    fetch(`${FETCHURL}${queue[currentSongIndex]}.json`)
+    const currentSongId = queue[currentSongIndex];
+    if (!currentSongId) return;
+
+    fetch(`${SONGFETCHURL}${currentSongId}.json`)
       .then(res => res.json())
-      .then(data => {
+      .then(data => { 
+        if (data == null) return;
+
         setSongData(data);
-        audio.src = data.songURL;
+        if (data && data.songURL) {
+          audio.src = data.songURL;
+        }
 
         if (loadingNewSong) {
           audio.play();
@@ -110,18 +113,23 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
 
   function handleSongEnded() {
     let newIndex;
-    if (isShuffleEnabled) {
-      const randomIndex = Math.floor(Math.random() * queue.length);
-      newIndex = randomIndex !== currentSongIndex ? randomIndex : (randomIndex + 1) % queue.length;
+
+    if (queue.length == 0) {
+      newIndex = currentSongIndex;
     } else {
-      if (queue.length == 1) {
-        newIndex = currentSongIndex;
-      } else {
-        newIndex = (currentSongIndex + 1) % queue.length;
-      }
+      newIndex = (currentSongIndex + 1);
     }
     setCurrentSongIndex(newIndex);
   }
+
+  useEffect(() => {
+    fetch(`${ARTFETCHURL}${songData.releaseURI}/iconURL.json`)
+    .then(res => res.json())
+    .then(data => {
+      if (data == null) return;
+      setArtwork(data);
+    });
+  }, [songData]);
 
   function changeVolume(event: React.ChangeEvent<HTMLInputElement>) {
     audio.volume = Number(event.target.value) / 100;
@@ -159,69 +167,54 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
   audio.preload = "metadata";
 
   useEffect(() => {
-    let seekslider = document.getElementById("seekSlider")! as HTMLInputElement;
-    let totalTimeIndicator = document.getElementById("totalTime")!;
-
-
+    const seekslider = document.getElementById("seekSlider") as HTMLInputElement | null;
+    const totalTimeIndicator = document.getElementById("totalTime") as HTMLElement | null;
+  
     const handleLoadedMetadata = () => {
+      if (!seekslider || !totalTimeIndicator) return;
+  
       seekslider.max = String(Math.floor(audio.duration * 1000));
-
-      let duration = Math.floor(audio.duration);
-      let seconds;
-      if (duration % 60 <= 9) {
-        seconds = "0" + duration % 60;
-      } else {
-        seconds = duration % 60;
-      }
-
-      let minutes;
-      if (Math.floor(duration / 60) <= 9) {
-        minutes = "0" + Math.floor(duration / 60);
-      } else {
-        minutes = Math.floor(duration / 60);
-      }
-
-      totalTimeIndicator.innerHTML = `${minutes + ":" + seconds}`;
-
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+  
+      const duration = Math.floor(audio.duration);
+      const seconds = duration % 60 < 10 ? "0" + (duration % 60) : duration % 60;
+      const minutes = Math.floor(duration / 60) < 10 ? "0" + Math.floor(duration / 60) : Math.floor(duration / 60);
+  
+      totalTimeIndicator.innerHTML = `${minutes}:${seconds}`;
+  
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
-
-    audio.addEventListener('timeupdate', () => {
-      let curTimeIndicator = document.getElementById("curTime")!;
+  
+    const handleTimeUpdate = () => {
+      const curTimeIndicator = document.getElementById("curTime") as HTMLElement | null;
+      if (!seekslider || !curTimeIndicator) return;
+  
       seekslider.value = String(audio.currentTime * 1000);
-
-      let min = 0
-      let max = Math.floor(audio.duration * 1000);
-      let val = (audio.currentTime);
-      seekslider.style.backgroundSize = (val * 100000) / (max - min) + '% 100%'
-
-      let currentTime = Math.floor(audio.currentTime);
-      let seconds;
-      if (currentTime % 60 <= 9) {
-        seconds = "0" + currentTime % 60;
-      } else {
-        seconds = currentTime % 60;
-      }
-
-      let minutes;
-      if (Math.floor(currentTime / 60) <= 9) {
-        minutes = "0" + Math.floor(currentTime / 60);
-      } else {
-        minutes = Math.floor(currentTime / 60);
-      }
-
-      curTimeIndicator.innerHTML = `${minutes + ":" + seconds}`;
-    });
-
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+  
+      const min = 0;
+      const max = Math.floor(audio.duration * 1000);
+      const val = audio.currentTime;
+      seekslider.style.backgroundSize = (val * 100000) / (max - min) + "% 100%";
+  
+      const currentTime = Math.floor(audio.currentTime);
+      const seconds = currentTime % 60 < 10 ? "0" + (currentTime % 60) : currentTime % 60;
+      const minutes = Math.floor(currentTime / 60) < 10 ? "0" + Math.floor(currentTime / 60) : Math.floor(currentTime / 60);
+  
+      curTimeIndicator.innerHTML = `${minutes}:${seconds}`;
+    };
+  
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+  
+    // Cargar audio al montarse el componente
     audio.load();
-
-    fetch(`https://zxqm-rest-api-default-rtdb.firebaseio.com/releases/${songData.releaseURI}/iconURL.json`)
-      .then(res => res.json())
-      .then((data: any) => {  // Use `any` type as a workaround for now
-        setArtwork(data);
-      });
+  
+    // Limpiar eventos al desmontar
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+    };
   }, [audio, songData]);
+  
 
   useEffect(() => {
     if ("mediaSession" in navigator) {
@@ -253,7 +246,6 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
 
   return (
     <>
-      {queue.length == 0 ? "" :
       <div className='player-wrapper'>
         <div className='zxqm-player'>
           <div className="seek">
@@ -267,8 +259,8 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
             <div className="info">
               <img draggable="false" src={artwork ? artwork : ""} />
               <div className="details">
-                <h1>{songData.songName}</h1>
-                <h2>{formatArtists(songData.songArtists)}</h2>
+                <h1>{songData && songData.songName ? songData.songName : null}</h1>
+                <h2>{songData && songData.songArtists ? formatArtists(songData.songArtists) : null}</h2>
               </div>
             </div>
 
@@ -311,7 +303,7 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
             </div>
 
             <div className="other">
-              {songData.lyricsURI != undefined ?
+              {songData && songData.lyricsURI != undefined ?
                 <PlayerButton
                   custom_classes={locationData.pathname == '/lyrics' ? 'actlyrics' : 'lyrics'}
                   onClickAction={() => { }}
@@ -325,7 +317,7 @@ export const Player = ({ queue, audio, currentSongIndex, setCurrentSongIndex }: 
             </div>
           </div>
         </div>
-      </div>}
+      </div>
     </>
   )
 }

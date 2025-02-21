@@ -34,13 +34,17 @@ export const Lyrics = ({audio, queue, currentSongIndex} : LyricsArgs) => {
     fetch(`${LYRICSFETCHURL}${songData}.json`)
       .then(res => res.json())
       .then(data => {
+        if (data == null || data == undefined){
+          setLyricsFetched({"lyrics": "placeholder"});
+          return;
+        }
         setLyricsFetched(data);
       });
   }, [songData]);
 
   useEffect(()=> {
     if (rabitLyricsLoaded) return;
-    if (lyricsFetched.lyrics == "placeholder") return;
+    if (lyricsFetched.lyrics == "placeholder" || lyricsFetched.lyrics == null || lyricsFetched.lyrics == undefined) return;
     generateLyrics();
     setRabitLyricsLoaded(true);
   },[lyricsFetched])
